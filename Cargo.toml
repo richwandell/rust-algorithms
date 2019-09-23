@@ -8,3 +8,9 @@ edition = "2018"
 
 [dependencies]
 rand = "0.7"
+num_cpus = "1.10.1"
+spmc = "0.3.0"
+
+[profile.dev]
+opt-level = 3
+debug = false
