@@ -30,6 +30,7 @@ fn quick_sort(arr: &mut Vec<i32>, low: i32, high: i32) {
 }
 
 fn main() {
+    //optimized 2590455
     let mut nums = generate_numbers(1000000);
 //    let mut nums = vec![5, 6, 10, 50, 1];
     let length: i32 = nums.len() as i32;

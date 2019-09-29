@@ -52,7 +52,7 @@ fn merge_sort(arr: &mut Vec<i32>, start: i32, end: i32, temp: &mut Vec<i32>) {
 fn main() {
 
     //unoptimized 58247402
-    //optimized    1098721
+    //optimized    1059373
     let mut nums = generate_numbers(10000000);
     let length: i32 = nums.len() as i32;
 
