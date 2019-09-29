@@ -1,21 +1,10 @@
 extern crate rand;
 
-use rand::distributions::{Distribution, Uniform};
+pub mod utils;
+
 use std::time::Instant;
+use utils::generate_numbers;
 
-fn generate_numbers(num: i32) -> Vec<i32> {
-    // Returns a vector with randomly generated numbers
-    let mut rng = rand::thread_rng();
-    let distribution = Uniform::from(1..100);
-
-    let mut nums : Vec<i32> = Vec::new();
-
-    for _x in 0..num {
-        let num = distribution.sample(&mut rng);
-        nums.push(num);
-    }
-    return nums;
-}
 
 fn merge(arr: &mut Vec<i32>, start: i32, mid: i32, end: i32, temp: &mut Vec<i32>) {
     let mut i = start;
@@ -61,8 +50,10 @@ fn merge_sort(arr: &mut Vec<i32>, start: i32, end: i32, temp: &mut Vec<i32>) {
 }
 
 fn main() {
-    //53443408
-    let mut nums = generate_numbers(1000);
+
+    //unoptimized 58247402
+    //optimized    1098721
+    let mut nums = generate_numbers(10000000);
     let length: i32 = nums.len() as i32;
 
     let now = Instant::now();
@@ -71,5 +62,5 @@ fn main() {
     let elapsed = now.elapsed().as_micros();
 
     println!("{}", elapsed);
-    println!("{:?}", nums);
+//    println!("{:?}", nums);
 }
