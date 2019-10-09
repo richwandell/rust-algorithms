@@ -9,17 +9,19 @@ use ndarray_rand::rand_distr::Uniform;
 struct NeuralNetwork {
     W1: Array2<f64>,
     W2: Array2<f64>,
-//    y_hat: Array2<f64>,
-//    Z2: Array2<f64>,
-//    A2: Array2<f64>
+    y_hat: Array2<f64>,
+    Z2: Array2<f64>,
+    Z3: Array2<f64>,
+    A2: Array2<f64>
 }
 
 trait Works {
     fn new(input_layer_size: i32, hidden_layer_size: i32, output_layer_size: i32) -> NeuralNetwork;
-    fn forward(&mut self, X: ArrayBase<OwnedRepr<f64>, Ix2>);
-    fn train(&mut self, X: ArrayBase<OwnedRepr<f64>, Ix2>, y: ArrayBase<OwnedRepr<f64>, Ix2>);
-    fn cost_function_prime(&mut self, X: Array2<f64>, y: Array2<f64>);
-    fn compute_gradients(&mut self, X: Array2<f64>, y: Array2<f64>);
+    fn forward(&mut self, X: &Array2<f64>) -> Array2<f64>;
+    fn train(&mut self, X: &Array2<f64>, y: &Array2<f64>);
+    fn cost_function_prime(&mut self, X: &Array2<f64>, y: &Array2<f64>);
+    fn compute_gradients(&mut self, X: &Array2<f64>, y: &Array2<f64>);
+    fn sigmoid(&mut self, z: &Array2<f64>) -> Array2<f64>;
 }
 
 impl Works for NeuralNetwork {
@@ -33,43 +35,75 @@ impl Works for NeuralNetwork {
             (hidden_layer_size as usize, output_layer_size as usize),
             Uniform::new(0., 1.)
         );
+        let y_hat: Array2<f64> = Array2::<f64>::random(
+            (hidden_layer_size as usize, output_layer_size as usize),
+            Uniform::new(0., 1.)
+        );
+        let mut Z2: Array2<f64> = Array2::<f64>::random(
+            (hidden_layer_size as usize, output_layer_size as usize),
+            Uniform::new(0., 1.)
+        );
+        let mut Z3: Array2<f64> = Array2::<f64>::random(
+            (hidden_layer_size as usize, output_layer_size as usize),
+            Uniform::new(0., 1.)
+        );
+        let mut A2: Array2<f64> = Array2::<f64>::random(
+            (hidden_layer_size as usize, output_layer_size as usize),
+            Uniform::new(0., 1.)
+        );
         NeuralNetwork{
             W1,
-            W2
+            W2,
+            y_hat,
+            Z2,
+            Z3,
+            A2
         }
     }
 
-    fn forward(&mut self, X: ArrayBase<OwnedRepr<f64>, Ix2>) {
-//        self.Z2 = math.multiply(X, this.W1);
-//        self.Z2 = math.add(1, this.Z2);
-//        self.A2 = this.sigmoid(this.Z2);
-//        this.A2 = math.add(1, this.A2);
-//        this.Z3 = math.multiply(this.A2, this.W2);
-//        this.Z3 = math.add(1, this.Z3);
-//        var yHat = this.sigmoid(this.Z3);
-//        return yHat;
+    fn forward(&mut self, X: &Array2<f64>) -> Array2<f64> {
+        let mut Z2 = X.dot(&self.W1);
+        Z2 = Z2 + 1.;
+        let mut A2 = self.sigmoid(&Z2);
+        A2 = A2 + 1.;
+        self.A2 = A2;
+        let mut Z3 = self.A2.dot(&self.W2);
+        Z3 = Z3 + 1.;
+        let y_hat = self.sigmoid(&Z3);
+        self.Z2 = Z2;
+        self.Z3 = Z3;
+        return y_hat;
     }
 
-    fn train(&mut self,  &mut X: Array2<f64>, &mut y: Array2<f64>) {
+    fn sigmoid(&mut self, z: &Array2<f64>) -> Array2<f64> {
+        let mut bottom = z * -1.;
+        bottom.mapv(|a| {
+            1. / (1. + std::f64::consts::E.powf(a))
+        })
+    }
+
+    fn train(&mut self, X: &Array2<f64>, y: &Array2<f64>) {
         let alpha = 0.02;
         let pcost = 9999999999999999.;
         let cost_diff = pcost;
         let momentum = 0.9;
+
         loop {
-            let grad = self.compute_gradients(X, y);
+            self.compute_gradients(&X, &y);
+//            let grad = self.compute_gradients(X, y);
             if cost_diff <= 0.000000000001 {
                 break
             }
         }
     }
 
-    fn compute_gradients(&mut self, X: Array2<f64>, y: Array2<f64>) {
-        let djdwa = self.cost_function_prime(X, y);
-        return djdwa;
+    fn compute_gradients(&mut self, X: &Array2<f64>, y: &Array2<f64>) {
+        self.cost_function_prime(&X, &y);
+//        return djdwa;
     }
 
-    fn cost_function_prime(&mut self, X: Array2<f64>, y: Array2<f64>) {
-//        self.y_hat = self.forward(X);
+    fn cost_function_prime(&mut self, X: &Array2<f64>, y: &Array2<f64>) {
+        self.y_hat = self.forward(&X);
     }
 }
 
@@ -91,7 +125,7 @@ fn main () {
     let y = training_y / 100.;
 
     let mut n = NeuralNetwork::new(2, 3, 1);
-    n.train(X, y);
+    n.train(&X, &y);
 
 
 
