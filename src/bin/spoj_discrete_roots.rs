@@ -4,6 +4,8 @@ use std::process;
 fn powmod(mut a: i32, mut b: i32, p: i32) -> i32 {
     let mut res = 1;
     while b > 0 {
+
+        
         if b & 1 {
             res = res * a % p;
         }
